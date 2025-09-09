@@ -2,6 +2,14 @@ name: "Create release"
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g., 1.2.0.0). Optional if running on tag push."
+        required: false
+        type: string
+  push:
+    tags:
+      - '*'
 
 permissions:
   contents: write
@@ -27,15 +35,32 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Build, tag and release
+      - name: Determine version
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            # On tag push, github.ref_name is the tag name
+            if [[ "${{ github.ref_type }}" == "tag" ]]; then
+              echo "VERSION=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            else
+              # Fallback to latest tag
+              echo "VERSION=$(git describe --tags --abbrev=0 || echo 1.1.0.0)" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Build and release (no tag creation in CI)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.ver.outputs.VERSION }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          echo "Releasing version: ${VERSION}"
           # Ensure optional packages directory exists to satisfy Makefile zip step
           mkdir -p packages
-          make release
+          make ci-release
 
       - name: Commit and push updated manifest
         env:
@@ -43,7 +68,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          VERSION="$(make -s print || true)"
+          VERSION="${{ steps.ver.outputs.VERSION }}"
           git add manifest.json
           git commit -m "chore(release): update manifest for ${VERSION}" || echo "No changes to commit"
           git push
