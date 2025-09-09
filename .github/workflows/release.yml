@@ -36,3 +36,14 @@ jobs:
           # Ensure optional packages directory exists to satisfy Makefile zip step
           mkdir -p packages
           make release
+
+      - name: Commit and push updated manifest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          VERSION="$(make -s print || true)"
+          git add manifest.json
+          git commit -m "chore(release): update manifest for ${VERSION}" || echo "No changes to commit"
+          git push
