@@ -145,7 +145,8 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
                     collectionIdsByProvider[provider.Name] = boxSet.Id;
                     pendingAddsByCollection[boxSet.Id] = new HashSet<Guid>();
                     _logger.LogInformation("Created collection '{Collection}'", collectionName);
-
+                    boxSet.PremiereDate = DateTime.UtcNow;
+                    await _libraryManager.UpdateItemAsync(boxSet, boxSet, ItemUpdateType.MetadataEdit, cancellationToken).ConfigureAwait(false);
                     // Try to set image right after creation
                     try
                     {
@@ -155,6 +156,7 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
                     {
                         _logger.LogError(ex, "Failed to set image for new collection '{Collection}'", collectionName);
                     }
+
                 }
             }
         }
