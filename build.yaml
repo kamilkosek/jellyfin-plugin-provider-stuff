@@ -1,0 +1,29 @@
+---
+name: "ProviderStuff"
+guid: "eb5d7894-8eef-4b36-aa6f-5d124e828ce1"
+version: "1.1.0.0"
+targetAbi: "10.9.0.0"
+framework: "net8.0"
+overview: "Applies provider tags, manages provider collections, and exposes provider/item APIs with pagination."
+description: >
+  ProviderStuff automates tagging library items with provider tags and optionally creates/maintains
+  Box Set collections per provider. It also exposes API endpoints for integrations:
+
+  - GET /providerstuff/providers
+    Returns configured providers including collectionId (if created) and provider logo URL.
+
+  - GET /providerstuff/{providerName}/items?userId=&includeItemTypes=&limit=&startIndex=
+    Returns paginated BaseItemDto results for items tagged with provider:{name}, respecting DTO user context.
+
+  Performance optimizations include pre-creating collections and batching item additions.
+category: "General"
+owner: "kamilkosek"
+artifacts:
+- "Jellyfin.Plugin.ProviderStuff.dll"
+changelog: >
+  - Fix: Reliable plugin configuration retrieval in scheduled task
+  - Feature: Create and maintain per-provider Box Set collections (optional)
+  - Perf: Pre-create collections and batch item additions
+  - API: /providerstuff/providers returns providers with collectionId
+  - API: /providerstuff/{providerName}/items returns BaseItemDto with pagination
+  - Misc: Use DtoService for rich item responses

@@ -1,0 +1,89 @@
+{
+  // Paths and plugin name are configured in settings.json
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // A chain task - build the plugin, then copy it to your
+      // jellyfin server's plugin directory and optionally deploy to a remote
+      "label": "build-and-copy",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "build",
+        "deploy-remote"
+      ]
+    },
+    {
+      // Build the plugin
+      "label": "build",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+        "publish",
+        "--configuration=Debug",
+        "${workspaceFolder}/${config:pluginName}.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      // Ensure the plugin directory exists before trying to use it
+      "label": "make-plugin-dir",
+      "type": "shell",
+      "command": "mkdir",
+      "windows": {
+        "args": [
+          "-Force",
+          "-Path",
+          "${config:jellyfinWindowsDataDir}/plugins/${config:pluginName}/"
+        ]
+      },
+      "linux": {
+        "args": [
+          "-p",
+          "${config:jellyfinLinuxDataDir}/plugins/${config:pluginName}/"
+        ]
+      }
+    },
+    {
+      // Copy the plugin dll to the jellyfin plugin install path
+      // This command copies every .dll from the build directory to the plugin dir
+      // Usually, you probablly only need ${config:pluginName}.dll
+      // But some plugins may bundle extra requirements
+      "label": "copy-dll",
+      "type": "shell",
+      "command": "cp",
+      "windows": {
+        "args": [
+          "./${config:pluginName}/bin/Debug/net8.0/publish/*",
+          "${config:jellyfinWindowsDataDir}/plugins/${config:pluginName}/"
+        ]
+      },
+      "linux": {
+        "args": [
+          "-r",
+          "./${config:pluginName}/bin/Debug/net8.0/publish/*",
+          "${config:jellyfinLinuxDataDir}/plugins/${config:pluginName}/"
+        ]
+      }
+    },
+    {
+      // Deploy the plugin to a remote Jellyfin server and restart the service
+      // This will run the repository-local `deploy2.sh` script. The script
+      // contains hardcoded remote details per the user's request.
+      "label": "deploy-remote",
+      "type": "shell",
+      "command": "./deploy2.sh",
+      "args": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
