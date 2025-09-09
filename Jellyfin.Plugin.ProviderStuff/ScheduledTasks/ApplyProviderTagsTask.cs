@@ -156,7 +156,6 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
                     {
                         _logger.LogError(ex, "Failed to set image for new collection '{Collection}'", collectionName);
                     }
-
                 }
             }
         }
