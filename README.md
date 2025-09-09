@@ -14,20 +14,20 @@ ProviderStuff automates tagging library items with streaming provider tags, keep
 
 ## Installation
 
-There are two common ways to install a development build:
+Recommended (via Plugin Repository):
+1. In Jellyfin, go to Dashboard → Plugins → Repositories
+2. Add this URL as a new repository:
+    https://raw.githubusercontent.com/kamilkosek/jellyfin-plugin-provider-stuff/main/manifest.json
+3. Go to Catalog, search for “ProviderStuff”, install it
+4. Restart Jellyfin
 
-1) Using the included VS Code tasks (recommended during development)
-- Use the “build-and-copy” task to publish and copy the plugin into your Jellyfin data directory. The task uses your workspace settings (plugin name, data dir) and runs the publish step and copy in sequence.
-
-2) Manual build and copy
-- Build the solution in Debug: publish the `Jellyfin.Plugin.ProviderStuff.sln`
-- Copy `Jellyfin.Plugin.ProviderStuff.dll` (and the contents of the publish folder) into your Jellyfin plugins directory at: `<jellyfin-data>/plugins/Jellyfin.Plugin.ProviderStuff/`
-
-Restart Jellyfin after copying.
+Optional: Development install
+- Using VS Code tasks: run the “build-and-copy” task to publish and copy to your Jellyfin data directory
+- Manual: publish the solution, then copy `Jellyfin.Plugin.ProviderStuff.dll` (and publish contents) to `<jellyfin-data>/plugins/Jellyfin.Plugin.ProviderStuff/`
 
 Requirements:
-- .NET SDK 8.0+
 - Jellyfin Server 10.9+
+- .NET SDK 8.0+ (only for local builds)
 
 ---
 
