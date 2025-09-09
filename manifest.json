@@ -16,6 +16,14 @@
         "imageUrl": "",
         "versions": [
             {
+                "version": "1.2.0.0",
+                "changelog": "- See the full changelog at [GitHub](https://github.com/kamilkosek/jellyfin-plugin-provider-stuff/releases/tag/1.2.0.0)\n",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://github.com/kamilkosek/jellyfin-plugin-provider-stuff/releases/download/1.2.0.0/providerstuff-1.2.0.0.zip",
+                "checksum": "fdc10b5c7071f4e3fc2d24becd58feac",
+                "timestamp": "2025-09-09T21:23:04Z"
+            },
+            {
                 "version": "1.1.0.0",
                 "changelog": "- See the full changelog at [GitHub](https://github.com/kamilkosek/jellyfin-plugin-provider-stuff/releases/tag/1.1.0.0)\n",
                 "targetAbi": "10.9.0.0",
