@@ -125,7 +125,7 @@
                     // helper: convert TMDB logo_path to full URL if needed
                     function logoUrl(p) {
                         if (!p || !p.logo_path) return '';
-                        return p.logo_path.indexOf('http') === 0 ? p.logo_path : ('https://image.tmdb.org/t/p/w92' + p.logo_path);
+                        return p.logo_path.indexOf('http') === 0 ? p.logo_path : ('https://image.tmdb.org/t/p/original' + p.logo_path);
                     }
 
                     // Render checkboxes with thumbnail images
