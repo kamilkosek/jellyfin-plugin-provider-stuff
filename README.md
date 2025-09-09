@@ -106,6 +106,27 @@ Notes:
 
 Tip: Configure your workspace settings (pluginName, jellyfinDir/webDir/dataDir if you adopt the example tasks) to streamline debugging.
 
+### Release Process
+
+The project uses an automated release workflow that:
+
+1. **Auto-computes the next version** using `scripts/next-version.js`
+   - Finds the latest git tag with a 3- or 4-part numeric version (e.g., `1.2.3` or `1.2.3.4`)
+   - Increments the build number by default, or respects `BUMP` environment variable (`major`, `minor`, `patch`, `build`)
+   - Falls back to `1.1.0.0` if no version tags exist
+
+2. **Creates idempotent releases** via the GitHub workflow
+   - Re-running the same release won't fail if tags/releases already exist
+   - Tags are only created if they don't exist
+   - GitHub releases are updated with `--clobber` if they already exist
+
+3. **Updates all version references consistently**
+   - Updates `AssemblyVersion` and `FileVersion` in the `.csproj` file
+   - Names the ZIP file with the computed version
+   - Updates `manifest.json` with the new version entry
+
+To trigger a release, use the "Create release" workflow dispatch in GitHub Actions. The process will automatically determine the next version and handle all steps idempotently.
+
 ---
 
 ## Changelog (summary)
