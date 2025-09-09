@@ -128,6 +128,16 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
                 {
                     collectionIdsByProvider[provider.Name] = existing.Id;
                     pendingAddsByCollection[existing.Id] = new HashSet<Guid>();
+
+                    // Ensure the collection has a primary image if configured
+                    try
+                    {
+                        await EnsureCollectionImageAsync(existing, provider, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to ensure image for existing collection '{Collection}'", collectionName);
+                    }
                 }
                 else
                 {
@@ -135,6 +145,16 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
                     collectionIdsByProvider[provider.Name] = boxSet.Id;
                     pendingAddsByCollection[boxSet.Id] = new HashSet<Guid>();
                     _logger.LogInformation("Created collection '{Collection}'", collectionName);
+
+                    // Try to set image right after creation
+                    try
+                    {
+                        await EnsureCollectionImageAsync(boxSet, provider, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to set image for new collection '{Collection}'", collectionName);
+                    }
                 }
             }
         }
@@ -192,6 +212,54 @@ public class ApplyProviderTagsTask : IScheduledTask, IConfigurableScheduledTask
                     _logger.LogError(ex, "Failed to batch add items to collection {CollectionId}", collectionId);
                 }
             }
+        }
+    }
+
+    private async Task EnsureCollectionImageAsync(BoxSet collection, Provider provider, CancellationToken ct)
+    {
+        // Only proceed if a logo url is configured and the collection has no primary image yet
+        if (collection is null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(provider?.ProviderLogoUrl))
+        {
+            return;
+        }
+
+        if (collection.HasImage(ImageType.Primary, 0))
+        {
+            return; // don't overwrite existing imagery
+        }
+
+        var url = provider.ProviderLogoUrl.Trim();
+        _logger.LogInformation("Setting primary image for collection '{Name}' from {Url}", collection.Name, url);
+
+        // Add as remote image first
+        var remoteImage = new ItemImageInfo
+        {
+            Path = url,
+            Type = ImageType.Primary,
+            DateModified = DateTime.UtcNow
+        };
+
+        collection.AddImage(remoteImage);
+
+        // Persist image info
+        await _libraryManager.UpdateItemAsync(collection, collection, ItemUpdateType.ImageUpdate, ct).ConfigureAwait(false);
+
+        try
+        {
+            // Convert to local so it survives and benefits from caching/processing
+            var index = collection.GetImageIndex(remoteImage);
+            await _libraryManager.ConvertImageToLocal(collection, remoteImage, index, removeOnFailure: true).ConfigureAwait(false);
+            await _libraryManager.UpdateImagesAsync(collection, forceUpdate: true).ConfigureAwait(false);
+            _logger.LogInformation("Primary image set for collection '{Name}'", collection.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to convert image to local for collection '{Name}'", collection.Name);
         }
     }
 
