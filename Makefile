@@ -8,7 +8,9 @@ print:
 zip:
 	mkdir -p ./dist
 	zip -r -j "./dist/$(FILE)" Jellyfin.Plugin.ProviderStuff/bin/Release/net8.0/Jellyfin.Plugin.ProviderStuff.dll packages/
-	cd Jellyfin.Plugin.ProviderStuff/bin/Release/net8.0/ && find . -type d -not -path '.' -print | zip -ur "$(CURDIR)/dist/$(FILE)" -@
+	cd Jellyfin.Plugin.ProviderStuff/bin/Release/net8.0/ && \
+	dirs="$$(find . -type d -not -path '.' -print)"; \
+	if [ -n "$$dirs" ]; then zip -ur "$(CURDIR)/dist/$(FILE)" $$dirs; fi
 
 csum:
 	md5 ./dist/$(FILE)
