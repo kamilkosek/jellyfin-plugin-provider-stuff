@@ -27,6 +27,15 @@ jobs:
         with:
           node-version: "lts/*"
 
+      - name: Compute next version
+        run: |
+          VERSION=$(node scripts/next-version.js)
+          FILE="providerstuff-${VERSION}.zip"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "FILE=${FILE}" >> $GITHUB_ENV
+          echo "Computed next version: ${VERSION}"
+          echo "Computed file name: ${FILE}"
+
       - name: Build, tag and release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

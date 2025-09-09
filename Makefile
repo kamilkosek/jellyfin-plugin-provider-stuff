@@ -7,7 +7,9 @@ print:
 
 zip:
 	mkdir -p ./dist
-	zip -r -j "./dist/$(FILE)" Jellyfin.Plugin.ProviderStuff/bin/Release/net8.0/Jellyfin.Plugin.ProviderStuff.dll packages/
+	@if [ -f "./dist/$(FILE)" ]; then rm "./dist/$(FILE)"; fi
+	zip -r -j "./dist/$(FILE)" Jellyfin.Plugin.ProviderStuff/bin/Release/net8.0/Jellyfin.Plugin.ProviderStuff.dll
+	@if [ -d "packages" ]; then zip -ur "./dist/$(FILE)" packages/; fi
 	cd Jellyfin.Plugin.ProviderStuff/bin/Release/net8.0/ && \
 	dirs="$$(find . -type d -not -path '.' -print)"; \
 	if [ -n "$$dirs" ]; then zip -ur "$(CURDIR)/dist/$(FILE)" $$dirs; fi
@@ -16,11 +18,22 @@ csum:
 	md5 ./dist/$(FILE)
 
 create-tag:
-	git tag $(VERSION)
-	git push origin $(VERSION)
+	@if git rev-parse "$(VERSION)" >/dev/null 2>&1; then \
+		echo "Tag $(VERSION) already exists, skipping tag creation"; \
+	else \
+		echo "Creating tag $(VERSION)"; \
+		git tag $(VERSION); \
+		git push origin $(VERSION); \
+	fi
 
 create-gh-release:
-	gh release create $(VERSION) "./dist/$(FILE)" --generate-notes --verify-tag
+	@if gh release view "$(VERSION)" >/dev/null 2>&1; then \
+		echo "Release $(VERSION) already exists, updating asset"; \
+		gh release upload "$(VERSION)" "./dist/$(FILE)" --clobber; \
+	else \
+		echo "Creating release $(VERSION)"; \
+		gh release create $(VERSION) "./dist/$(FILE)" --generate-notes --verify-tag; \
+	fi
 
 update-version:
 	VERSION=$(VERSION) node scripts/update-version.js
