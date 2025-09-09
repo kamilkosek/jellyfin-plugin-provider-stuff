@@ -1,19 +1,28 @@
 [
-  {
-    "name": "ProviderStuff",
-    "guid": "eb5d7894-8eef-4b36-aa6f-5d124e828ce1",
-    "version": "1.1.0.0",
-    "targetAbi": "10.9.0.0",
-    "framework": "net8.0",
-    "overview": "Applies provider tags, manages provider collections, and exposes provider/item APIs with pagination.",
-    "description": "ProviderStuff automates tagging items with provider:<name> tags, maintains optional Box Set collections, and provides API endpoints to list providers and items.",
-    "category": "General",
-    "owner": "kamilkosek",
-    "artifacts": [
-      "Jellyfin.Plugin.ProviderStuff.dll"
-    ],
-    "changelog": "- See the full changelog at GitHub releases",
-    "imageUrl": "",
-    "versions": []
-  }
+    {
+        "name": "ProviderStuff",
+        "guid": "eb5d7894-8eef-4b36-aa6f-5d124e828ce1",
+        "version": "1.1.0.0",
+        "targetAbi": "10.9.0.0",
+        "framework": "net8.0",
+        "overview": "Applies provider tags, manages provider collections, and exposes provider/item APIs with pagination.",
+        "description": "ProviderStuff automates tagging items with provider:<name> tags, maintains optional Box Set collections, and provides API endpoints to list providers and items.",
+        "category": "General",
+        "owner": "kamilkosek",
+        "artifacts": [
+            "Jellyfin.Plugin.ProviderStuff.dll"
+        ],
+        "changelog": "- See the full changelog at GitHub releases",
+        "imageUrl": "",
+        "versions": [
+            {
+                "version": "1.1.0.0",
+                "changelog": "- See the full changelog at [GitHub](https://github.com/kamilkosek/jellyfin-plugin-provider-stuff/releases/tag/1.1.0.0)\n",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://github.com/kamilkosek/jellyfin-plugin-provider-stuff/releases/download/1.1.0.0/providerstuff-1.1.0.0.zip",
+                "checksum": "783375b87e42a23cebc1a329a4802be8",
+                "timestamp": "2025-09-09T16:53:52Z"
+            }
+        ]
+    }
 ]
