@@ -5,3 +5,4 @@ obj/
 artifacts
 deploy2.sh
 .DS_Store
+dist/
